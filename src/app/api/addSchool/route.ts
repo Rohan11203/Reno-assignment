@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
-import { query } from "../lib/db";
+import { query } from "@/app/lib/db";
 
 import { ResultSetHeader } from "mysql2";
 

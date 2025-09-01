@@ -8,7 +8,7 @@ export async function query(sql: any, params: any) {
   });
 
   try {
-    const [result] = await connection.execute(sql, params);
+    const result = await connection.execute(sql, params);
     return result;
   } finally {
     await connection.end();
