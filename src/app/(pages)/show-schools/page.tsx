@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 type School = {
@@ -9,7 +10,6 @@ type School = {
   city: string;
   image: string;
 };
-
 export default function ShowSchoolsPage() {
   const [schools, setSchools] = useState<School[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +27,7 @@ export default function ShowSchoolsPage() {
 
         const data: School[] = await response.json();
         setSchools(data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -62,7 +63,7 @@ export default function ShowSchoolsPage() {
             className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col group"
           >
             <div className="relative">
-              <img
+              <Image
                 src={school.image}
                 alt={`Image of ${school.name}`}
                 className="w-full h-48 object-cover"

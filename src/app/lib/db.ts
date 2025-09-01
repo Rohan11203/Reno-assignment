@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function query(sql: any, params: any) {
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST || "localhost",

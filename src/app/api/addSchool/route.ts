@@ -44,12 +44,14 @@ export async function POST(request: NextRequest) {
     const [result] = (await query(
       "INSERT INTO schools (name, address, city, state, contact, image, email_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [name, address, city, state, contact, dbImagePath, email_id]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     )) as [ResultSetHeader, any];
 
     return NextResponse.json(
       { id: result.insertId, message: "School added successfully" },
       { status: 201 }
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log("API ERROR", error);
     return NextResponse.json(

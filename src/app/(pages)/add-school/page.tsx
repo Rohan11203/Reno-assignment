@@ -12,7 +12,6 @@ const FormSchema = z.object({
   state: z.string().min(2, "State is required."),
   contact: z.string().regex(/^\d{10}$/, "Contact must be a 10-digit number."),
   email_id: z.string().email("Invalid email address."),
-
   image: z
     .any()
     .refine((files) => files?.length === 1, "Image is required.")
@@ -28,7 +27,6 @@ const FormSchema = z.object({
 });
 
 type FormValues = z.infer<typeof FormSchema>;
-
 export default function AddSchoolPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<{
@@ -75,6 +73,7 @@ export default function AddSchoolPage() {
         message: "School added successfully!",
       });
       reset();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setSubmissionStatus({
         success: false,
