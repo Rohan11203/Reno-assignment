@@ -6,8 +6,8 @@ services:
     container_name: school-mysql-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: your_strong_password
-      MYSQL_DATABASE: school_directory
+      MYSQL_ROOT_PASSWORD: LGrBLrINAdXGNxCTXTsGkiZlocUxoUsD
+      MYSQL_DATABASE: railway
     ports:
       - "3306:3306"
     volumes:
