@@ -6,6 +6,7 @@ export async function query(sql: any, params: any) {
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "rohan123",
     database: process.env.DB_DATABASE || "schooldb",
+    port: Number(process.env.DB_PORT),
   });
 
   try {
