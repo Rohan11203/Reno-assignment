@@ -6,7 +6,7 @@ services:
     container_name: school-mysql-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: zaobMHmcBcccXvrjFXOyfwTLvcPbBEsu
+      MYSQL_ROOT_PASSWORD: uolBoTicJVfDmIVtEhASdGstRzLxgHAy
       MYSQL_DATABASE: railway
     ports:
       - "3306:3306"
