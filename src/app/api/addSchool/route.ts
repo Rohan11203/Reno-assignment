@@ -1,13 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
+import { NextResponse, NextRequest } from "next/server";
 import { query } from "@/app/lib/db";
-
 import { ResultSetHeader } from "mysql2";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
+    const imageFile = formData.get("image") as File | null;
+
+    if (!imageFile) {
+      return NextResponse.json(
+        { message: "Image is required" },
+        { status: 400 }
+      );
+    }
+
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+
+    const cloudinaryResponse = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "school_images" },
+        (error, result) => {
+          if (error) reject(error);
+          resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    });
+
+    const uploadedImage = cloudinaryResponse as { secure_url: string };
+    const dbImagePath = uploadedImage.secure_url;
 
     const name = formData.get("name");
     const address = formData.get("address");
@@ -15,53 +43,34 @@ export async function POST(request: NextRequest) {
     const state = formData.get("state");
     const contact = formData.get("contact");
     const email_id = formData.get("email_id");
-    const imageFile = formData.get("image");
-
-    if (!name || !address || !city || !state || !email_id || !imageFile) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const uploadDir = path.join(process.cwd(), "public", "schoolImages");
-
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    const buffer = Buffer.from(await (imageFile as File).arrayBuffer());
-
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniqueSuffix}-${(imageFile as File).name.replaceAll(
-      " ",
-      "_"
-    )}`;
-    const imagePath = path.join(uploadDir, filename);
-
-    await fs.writeFile(imagePath, buffer);
-
-    const dbImagePath = `/schoolImages/${filename}`;
 
     const [result] = (await query(
       "INSERT INTO schools (name, address, city, state, contact, image, email_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [name, address, city, state, contact, dbImagePath, email_id]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [
+        name!.toString(),
+        address!.toString(),
+        city!.toString(),
+        state!.toString(),
+        contact!.toString(),
+        dbImagePath,
+        email_id!.toString(),
+      ]
     )) as [ResultSetHeader, any];
 
     return NextResponse.json(
-      { id: result.insertId, message: "School added successfully" },
+      {
+        id: result.insertId,
+        message: "School added successfully with image uploaded to Cloudinary!",
+      },
       { status: 201 }
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log("API ERROR", error);
+  } catch (error: unknown) {
+    console.error("API Error:", error);
+    const message =
+      error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
-      {
-        message: "ERror adding school to database",
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
+      { message: "Error adding school", error: message },
+      { status: 500 }
     );
   }
 }
