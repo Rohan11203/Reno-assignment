@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         dbImagePath,
         email_id!.toString(),
       ]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     )) as [ResultSetHeader, any];
 
     return NextResponse.json(
